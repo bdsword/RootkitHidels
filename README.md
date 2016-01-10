@@ -26,3 +26,12 @@
 ## Get syscall table address
 
 獲得System call table的位址的方法有很多種，可以參考這個[網址](http://webcache.googleusercontent.com/search?q=cache%3AA6ys0KVxD7sJ%3Awww.linuxeden.com%2Fforum%2Fviewthread.php%3Faction%3Dprintable%26tid%3D62339+&cd=2&hl=zh-TW&ct=clnk&gl=tw)，我們採用的是第三種，或者是[這邊](https://memset.wordpress.com/2011/01/20/syscall-hijacking-dynamically-obtain-syscall-table-address-kernel-2-6-x/)也有說明幾種方式
+
+
+### 函數解說
+1. [hook_getdents64](https://github.com/bdsword/RootkitHidels/blob/master/rootkit_hidels.c#L92): 將getdents64替換成我們自己製作的[my_sys_getdents64](https://github.com/bdsword/RootkitHidels/blob/master/rootkit_hidels.c#L47)
+2. [unhook_getdents64](https://github.com/bdsword/RootkitHidels/blob/master/rootkit_hidels.c#L125): 將getdents64從我們自己製作的假function換回原本的getdents64
+3. [get_syscall_table_address](https://github.com/bdsword/RootkitHidels/blob/master/rootkit_hidels.c#L34): 將int 0x80 handler的起始位址作為參數，回傳syscall table的位址
+4. [get_wp_bit](https://github.com/bdsword/RootkitHidels/blob/master/rootkit_hidels.c#L72): 取得cr0的第16 bit([WP Bit](http://turbochaos.blogspot.tw/2013/09/linux-rootkits-101-1-of-3.html))
+5. [set_wp_bit](https://github.com/bdsword/RootkitHidels/blob/master/rootkit_hidels.c#L82): 設定cr0的第16 bit([WP Bit](http://turbochaos.blogspot.tw/2013/09/linux-rootkits-101-1-of-3.html))
+6. [my_sys_getdents64](https://github.com/bdsword/RootkitHidels/blob/master/rootkit_hidels.c#L4): 我們自己製作的假function，用來將[target_file](https://github.com/bdsword/RootkitHidels/blob/master/rootkit_hidels.c#L13)從回傳的結果中過濾掉
